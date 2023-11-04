@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import NewsItems from "./NewsItems";
 import { PropTypes } from "prop-types";
 import myImage from "../defaultImg.png";
+import InfiniteScroll from "react-infinite-scroll-component";
+
 const News = (props) => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -18,11 +20,25 @@ const News = (props) => {
     props.setProgress(70);
     setArticles(parsedata.articles);
     props.setProgress(90);
+
     setTotalResult(parsedata.totalResults);
     setLoading(false);
     props.setProgress(100);
   };
-  
+  const fetchMoreData = async () => {
+    let url = `https://newsapi.org/v2/top-headlines?country=${
+      props.country
+    }&category=${props.category}&apiKey=${props.apikey}&page=${
+      page + 1
+    }&pageSize=${props.pageSize}`;
+    let data = await fetch(url);
+    let parsedata = await data.json();
+    setPage(page + 1);
+    setArticles(articles.concat(parsedata.articles));
+    setTotalResult(parsedata.totalResults);
+    console.log(parsedata.articles);
+  };
+
   useEffect(() => {
     document.title = "NewsApp - " + props.category.toUpperCase();
     UpdateNews(page);
@@ -30,73 +46,62 @@ const News = (props) => {
 
   const previousHandler = () => {
     UpdateNews(page - 1);
-    setPage(page - 1);
   };
   const nextHandler = () => {
     if (page + 1 > Math.ceil(totalResults / props.pageSize)) {
+      setPage(page - 1);
     } else {
       UpdateNews(page + 1);
       setPage(page + 1);
     }
   };
-  return (
-    <div className="container mb-3" style={{marginTop:"90px"}} >
-      <h2 className="text-center my-4">{props.category.toUpperCase()} </h2>
-      {loading && (
-        <div className="spinner-border text-dark mx-auto d-block" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      )}
 
-      {!loading && (
-        <div className="d-flex flex-wrap justify-content-around">
-          {articles.map((e, i) => {
-            return (
-              <div key={i}>
-                <NewsItems
-                  title={e.title ? e.title : ""}
-                  desc={e.description ? e.description : ""}
-                  imageUrl={
-                    e.urlToImage
-                      ? e.urlToImage
-                      :myImage
-                  }
-                  newsUrl={e.url}
-                  author={e.author}
-                  date={e.publishedAt}
-                  source={e.source.name}
-                />
-              </div>
-            );
-          })}
-        </div>
-      )}
-      <div className="container my-2 d-flex justify-content-between">
-        <button
-          disabled={page <= 1}
-          type="button"
-          onClick={previousHandler}
-          className="btn btn-dark"
+  return (
+    <>
+      <div className="container mb-3" style={{ marginTop: "90px" }}>
+        <h2 className="text-center my-4">{props.category.toUpperCase()} </h2>
+        <InfiniteScroll
+          style={{ overflow: "visible" }}
+          dataLength={articles.length}
+          next={fetchMoreData}
+          hasMore={articles.length !== totalResults}
+          loader={
+            <div
+              className="spinner-border text-dark mx-auto d-block"
+              role="status"
+            >
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          }
         >
-          &larr;Previous
-        </button>
-        <p className="my-2">Page no. {page}</p>
-        <button
-          disabled={page + 1 > Math.ceil(totalResults / props.pageSize)}
-          type="button"
-          onClick={nextHandler}
-          className="btn btn-dark"
-        >
-          Next&rarr;
-        </button>
+          {!loading && (
+            <div className="d-flex flex-wrap  justify-content-around">
+              {articles.map((e, i) => {
+                return (
+                  <div key={i}>
+                    <NewsItems
+                      title={e.title ? e.title : ""}
+                      desc={e.description ? e.description : ""}
+                      imageUrl={e.urlToImage ? e.urlToImage : myImage}
+                      newsUrl={e.url}
+                      author={e.author}
+                      date={e.publishedAt}
+                      source={e.source.name}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </InfiniteScroll>
       </div>
-    </div>
+    </>
   );
 };
 
 News.defaultProps = {
   country: "in",
-  pageSize: 15,
+  pageSize: 3,
   category: "general",
   // apikey: "10a9732d7a8840c2ac1e18d88b24aa4a",
   apikey: "7f3c89a546164e2d8d670d387ba12408",
