@@ -100,8 +100,8 @@ const News = (props) => {
 };
 
 News.defaultProps = {
-  country: "in",
-  pageSize: 3,
+  pageSize: 15,
+  country:'in',
   category: "general",
   // apikey: "10a9732d7a8840c2ac1e18d88b24aa4a",
   apikey: "7f3c89a546164e2d8d670d387ba12408",
