@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-const Navbar = () => {
+const Navbar = (props) => {
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark py-1 fixed-top">
@@ -54,6 +54,26 @@ const Navbar = () => {
               </li>
             </ul>
           </div>
+            <div class="nav-item px-3 float-end" role="group" aria-label="Basic example">
+              <a
+                type="button"
+                onClick={() => {
+                  props.setCountry("us");
+                }}
+                class="btn btn-dark fs-6"
+              >
+                US
+              </a>
+              <a
+                type="button"
+                onClick={() => {
+                  props.setCountry("in");
+                }}
+                class="btn btn-dark"
+              >
+                IN
+              </a>
+            </div>
         </div>
       </nav>
     </>

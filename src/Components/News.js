@@ -42,7 +42,7 @@ const News = (props) => {
   useEffect(() => {
     document.title = "NewsApp - " + props.category.toUpperCase();
     UpdateNews(page);
-  }, []);
+  }, [props.category,props.country]);
 
   const previousHandler = () => {
     UpdateNews(page - 1);
@@ -101,10 +101,9 @@ const News = (props) => {
 
 News.defaultProps = {
   pageSize: 15,
-  country:'in',
   category: "general",
-  // apikey: "10a9732d7a8840c2ac1e18d88b24aa4a",
-  apikey: "7f3c89a546164e2d8d670d387ba12408",
+  apikey: "10a9732d7a8840c2ac1e18d88b24aa4a",
+  // apikey: "7f3c89a546164e2d8d670d387ba12408",
 };
 News.propTypes = {
   country: PropTypes.string,
